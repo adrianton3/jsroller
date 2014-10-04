@@ -104,6 +104,10 @@ describe 'Roller', ->
 				expect obfuscate 'function f(a) { } function g(b) { }'
 				.toEqual 'function ______(________) { } function _______(________) { }'
 
+			it 'obfuscates variables in object definitions', ->
+				expect obfuscate 'var b; ({ a: b });'
+				.toEqual 'var ______; ({ a: ______ });'
+
 
 		describe 'functions', ->
 			it 'obfuscates a function\'s name inside a function declaration', ->
