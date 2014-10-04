@@ -73,7 +73,7 @@
           key: key,
           value: node.raw
         });
-      } else if (node.type === 'Identifier' && parent.type !== 'Property') {
+      } else if (node.type === 'Identifier' && !(parent.type === 'Property' && key === 'key')) {
         varIds.push({
           parent: parent,
           key: key,
