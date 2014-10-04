@@ -2,3 +2,4 @@
 src/**/*.js
 test/spec/**/*.js
 test/CustomMatchers.js
+examples/browser/**/*.js
