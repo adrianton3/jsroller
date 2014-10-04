@@ -1,0 +1,4 @@
+.idea
+src/**/*.js
+test/spec/**/*.js
+test/CustomMatchers.js
