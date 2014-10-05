@@ -67,7 +67,7 @@
         });
       } else if (key === 'property' && parent.type === 'MemberExpression' && !parent.computed) {
         memberExpressions.push(parent);
-      } else if (node.type === 'Literal') {
+      } else if (node.type === 'Literal' && !(parent.type === 'Property' && key === 'key')) {
         literalEntries.push({
           parent: parent,
           key: key,
