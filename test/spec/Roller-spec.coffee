@@ -71,6 +71,9 @@ describe 'Roller', ->
 			it 'obfuscates the same literal multiple times', ->
 				(expect obfuscate '123; 123;').toEqual '__._; __._;'
 
+			it 'does not obfuscate literal object keys', ->
+				(expect obfuscate '({ "asd": 123 });').toEqual '({ \'asd\': __._ });'
+
 
 		describe 'variables', ->
 			it 'obfuscates a local variable', ->

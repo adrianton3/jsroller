@@ -58,7 +58,7 @@ getLevelInfo = (node) ->
 				return
 		else if key == 'property' and parent.type == 'MemberExpression' and not parent.computed
 			memberExpressions.push parent
-		else if node.type == 'Literal'
+		else if node.type == 'Literal' and not (parent.type == 'Property' and key == 'key')
 			literalEntries.push { parent, key, value: node.raw }
 		else if node.type == 'Identifier' and not (parent.type == 'Property' and key == 'key')
 			varIds.push { parent, key, name: node.name }
