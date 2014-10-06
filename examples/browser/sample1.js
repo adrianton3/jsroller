@@ -1,8 +1,5 @@
-function g() {}
-
-function f(cond) {
-	if (cond) {
-		function g() {}
-	}
-	g();
+a.b();
+window.d = 123;
+function f() {
+	f(d);
 }
