@@ -15,12 +15,33 @@ setupEditors = (onInput) ->
 	{ sourceEditor, outputEditor }
 
 
+setupGui = (onChange) ->
+	chkHeaders = document.getElementById 'chk-headers'
+	chkHeaders.addEventListener 'change', ->
+		options.headers = @checked
+		onChange()
+		return
+
+	chkWrap = document.getElementById 'chk-wrap'
+	chkWrap.addEventListener 'change', ->
+		options.wrap = @checked
+		onChange()
+		return
+
+	return
+
+
 onInput = ->
-	newSource = roller.obfuscate sourceEditor.getValue()
+	newSource = roller.obfuscate sourceEditor.getValue(), options
 	outputEditor.setValue newSource
 
 
+onOptionsChange = onInput
+
+
+options = {}
 { sourceEditor, outputEditor } = setupEditors onInput
+setupGui onOptionsChange
 
 AjaxUtil.load 'sample1.js', (source) ->
 	sourceEditor.setValue source, 1
