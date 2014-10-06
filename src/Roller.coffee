@@ -138,6 +138,7 @@ buildGlobalObject = (globals) ->
 
 obfuscate = (source, options = {}) ->
 	options.headers ?= true
+	options.wrap ?= false
 
 
 	getNewVars = (varsSet, frames) ->
@@ -257,10 +258,12 @@ obfuscate = (source, options = {}) ->
 		header += "#{literalsObject}\n" if literals.size
 		header += "#{globalsObject}\n" if globals.size
 
-		header + newSource
-	else
-		newSource
+		newSource = header + newSource
 
+	if options.wrap
+		newSource = "(function () {\n#{newSource}\n})();"
+
+	newSource
 
 
 window.roller ?= {}
