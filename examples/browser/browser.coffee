@@ -39,7 +39,7 @@ onInput = ->
 onOptionsChange = onInput
 
 
-options = {}
+options = headers: false, wrap: false
 { sourceEditor, outputEditor } = setupEditors onInput
 setupGui onOptionsChange
 
