@@ -43,7 +43,10 @@
 
   onOptionsChange = onInput;
 
-  options = {};
+  options = {
+    headers: false,
+    wrap: false
+  };
 
   _ref = setupEditors(onInput), sourceEditor = _ref.sourceEditor, outputEditor = _ref.outputEditor;
 
