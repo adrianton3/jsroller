@@ -93,11 +93,16 @@ getLevelInfo = (node) ->
 	}
 
 
-buildString = (n, prefix = '') ->
-	string = prefix
-	for i in [0...n]
-		string += '_'
-	string
+stringCache = ['']
+buildString = (n) ->
+	if n < stringCache.length
+		stringCache[n]
+	else
+		accumulator = stringCache[stringCache.length - 1]
+		for i in [stringCache.length..n]
+			accumulator += '_'
+			stringCache[i] = accumulator
+		accumulator
 
 
 buildProperty = (objectName, propertyName) ->
@@ -161,7 +166,7 @@ obfuscate = (source, options = {}) ->
 		if properties.has name
 			(properties.get name).newProperty
 		else
-			newName = buildString properties.size, '_'
+			newName = buildString (properties.size + 1)
 			newProperty = buildProperty '_', newName
 			properties.set name, { newName, newProperty }
 			newProperty
@@ -172,7 +177,7 @@ obfuscate = (source, options = {}) ->
 		if literals.has raw
 			(literals.get raw).newProperty
 		else
-			newName = buildString literals.size, '_'
+			newName = buildString (literals.size + 1)
 			newProperty = buildProperty '__', newName
 			literals.set raw, { newName, newProperty }
 			newProperty
@@ -183,7 +188,7 @@ obfuscate = (source, options = {}) ->
 		if globals.has name
 			(globals.get name).newProperty
 		else
-			newName = buildString globals.size, '_'
+			newName = buildString (globals.size + 1)
 			newProperty = buildProperty '___', newName
 			globals.set name, { newName, newProperty }
 			newProperty
