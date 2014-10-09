@@ -105,17 +105,6 @@ buildString = (n) ->
 		accumulator
 
 
-buildProperty = (objectName, propertyName) ->
-	type: 'MemberExpression',
-	computed: false,
-	object:
-		type: 'Identifier',
-		name: objectName
-	property:
-		type: 'Identifier',
-		name: propertyName
-
-
 buildPropertyObject = (properties) ->
 	string = 'var _ = {\n'
 	properties.forEach (entry, key) ->
@@ -141,6 +130,30 @@ buildGlobalObject = (globals) ->
 	string += '};'
 
 
+buildProperty = (objectName, propertyName) ->
+	type: 'MemberExpression',
+	computed: false,
+	object:
+		type: 'Identifier',
+		name: objectName
+	property:
+		type: 'Identifier',
+		name: propertyName
+
+
+getReplacer = (objectName) ->
+	properties = new Map
+
+	(name) ->
+		if properties.has name
+			properties.get name
+		else
+			newName = buildString (properties.size + 1)
+			newProperty = buildProperty objectName, newName
+			properties.set name, newProperty
+			newProperty
+
+
 obfuscate = (source, options = {}) ->
 	options.headers ?= true
 	options.wrap ?= false
@@ -161,37 +174,9 @@ obfuscate = (source, options = {}) ->
 		map
 
 
-	properties = new Map
-	getPropertyReplacer = (name) ->
-		if properties.has name
-			(properties.get name).newProperty
-		else
-			newName = buildString (properties.size + 1)
-			newProperty = buildProperty '_', newName
-			properties.set name, { newName, newProperty }
-			newProperty
-
-
-	literals = new Map
-	getLiteralReplacer = (raw) ->
-		if literals.has raw
-			(literals.get raw).newProperty
-		else
-			newName = buildString (literals.size + 1)
-			newProperty = buildProperty '__', newName
-			literals.set raw, { newName, newProperty }
-			newProperty
-
-
-	globals = new Map
-	getGlobalReplacer = (name) ->
-		if globals.has name
-			(globals.get name).newProperty
-		else
-			newName = buildString (globals.size + 1)
-			newProperty = buildProperty '___', newName
-			globals.set name, { newName, newProperty }
-			newProperty
+	replaceProperty = getReplacer '_'
+	replaceLiteral = getReplacer '__'
+	replaceGlobal = getReplacer '___'
 
 
 	replace = (node, frames) ->
@@ -226,18 +211,18 @@ obfuscate = (source, options = {}) ->
 			else if variable.name == 'window'
 				variable.name = '___'
 			else
-				varId.parent[varId.key] = getGlobalReplacer varId.name
+				varId.parent[varId.key] = replaceGlobal varId.name
 			return
 
 		# replace member properties
 		memberExpressions.forEach (memberExpression) ->
-			memberExpression.property = getPropertyReplacer memberExpression.property.name
+			memberExpression.property = replaceProperty memberExpression.property.name
 			memberExpression.computed = true
 			return
 
 		# replace literals
 		literalEntries.forEach (entry) ->
-			entry.parent[entry.key] = getLiteralReplacer entry.value
+			entry.parent[entry.key] = replaceLiteral entry.value
 			return
 
 		# obfuscate the following levels
@@ -269,6 +254,7 @@ obfuscate = (source, options = {}) ->
 		newSource = "(function () {\n#{newSource}\n})();"
 
 	newSource
+
 
 
 window.roller ?= {}
