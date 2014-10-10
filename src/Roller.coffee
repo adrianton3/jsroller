@@ -93,18 +93,6 @@ getLevelInfo = (node) ->
 	}
 
 
-stringCache = ['']
-buildString = (n) ->
-	if n < stringCache.length
-		stringCache[n]
-	else
-		accumulator = stringCache[stringCache.length - 1]
-		for i in [stringCache.length..n]
-			accumulator += '_'
-			stringCache[i] = accumulator
-		accumulator
-
-
 buildPropertyObject = (properties) ->
 	string = 'var _ = {\n'
 	properties.forEach (entry, key) ->
@@ -141,42 +129,45 @@ buildProperty = (objectName, propertyName) ->
 		name: propertyName
 
 
-getReplacer = (objectName) ->
-	properties = new Map
+getReplacer = (objectName, buildString) ->
+	map = new Map
 
-	(name) ->
-		if properties.has name
-			properties.get name
+	replacer = (name) ->
+		if map.has name
+			(map.get name).newProperty
 		else
-			newName = buildString (properties.size + 1)
+			newName = buildString (map.size + 1)
 			newProperty = buildProperty objectName, newName
-			properties.set name, newProperty
+			map.set name, { newName, newProperty }
 			newProperty
+
+	[map, replacer]
 
 
 obfuscate = (source, options = {}) ->
 	options.headers ?= true
 	options.wrap ?= false
+	options.stringBuilderType ?= 'Unary'
 
 
-	getNewVars = (varsSet, frames) ->
+	getNewVars = (varsSet, frames, prefix) ->
 		map = new Map
-		localPrefix = ''
+		localPrefix = 0
 		varsSet.forEach (varName) ->
 			frame = frames.find (entry) -> entry.varsMap.has varName
 			if frame?
 				map.set varName, frame.value.varsMap.get varName
 			else
 				# get new variable name
-				localPrefix += '_'
-				map.set varName, frames.value.prefix + localPrefix
+				localPrefix++
+				map.set varName, buildString (prefix + localPrefix)
 			return
 		map
 
-
-	replaceProperty = getReplacer '_'
-	replaceLiteral = getReplacer '__'
-	replaceGlobal = getReplacer '___'
+	buildString = roller["get#{options.stringBuilderType}Builder"]()
+	[properties, replaceProperty] = getReplacer '_', buildString
+	[literals, replaceLiteral] = getReplacer '__', buildString
+	[globals, replaceGlobal] = getReplacer '___', buildString
 
 
 	replace = (node, frames) ->
@@ -195,7 +186,7 @@ obfuscate = (source, options = {}) ->
 		# add mapping to the stack of frames
 		updatedFrames = frames.add {
 			varsMap,
-			prefix: frames.value.prefix + buildString varsMap.size
+			prefix: frames.value.prefix + varsMap.size
 		}
 
 		# replace local vars
@@ -235,7 +226,7 @@ obfuscate = (source, options = {}) ->
 
 
 	tree = esprima.parse source
-	replace tree, roller.Emp.add { varsMap: new Map, prefix: '_____' }
+	replace tree, roller.Emp.add { varsMap: new Map, prefix: 5 }
 	newSource = escodegen.generate tree
 
 	if options.headers
