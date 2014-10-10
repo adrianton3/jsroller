@@ -28,7 +28,7 @@ getBinaryBuilder = (prefix = '') ->
 		else
 			for i in [cache.length..n]
 				cache[i] = build i
-		console.log cache
+
 		cache[n]
 
 

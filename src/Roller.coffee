@@ -167,7 +167,7 @@ obfuscate = (source, options = {}) ->
 	buildString = roller["get#{options.stringBuilderType}Builder"]()
 	[properties, replaceProperty] = getReplacer '_', buildString
 	[literals, replaceLiteral] = getReplacer '__', buildString
-	[globals, replaceGlobal] = getReplacer '___', buildString
+	[globals, replaceGlobal] = getReplacer '____', buildString
 
 
 	replace = (node, frames) ->
