@@ -28,6 +28,12 @@ setupGui = (onChange) ->
 		onChange()
 		return
 
+	chkBinary = document.getElementById 'chk-binary'
+	chkBinary.addEventListener 'change', ->
+		options.stringBuilderType = if @checked then 'Binary' else 'Unary'
+		onChange()
+		return
+
 	return
 
 
@@ -39,7 +45,7 @@ onInput = ->
 onOptionsChange = onInput
 
 
-options = headers: false, wrap: false
+options = headers: false, wrap: false, stringBuilderType: 'Unary'
 { sourceEditor, outputEditor } = setupEditors onInput
 setupGui onOptionsChange
 
