@@ -22,7 +22,7 @@
   };
 
   setupGui = function(onChange) {
-    var chkHeaders, chkWrap;
+    var chkBinary, chkHeaders, chkWrap;
     chkHeaders = document.getElementById('chk-headers');
     chkHeaders.addEventListener('change', function() {
       options.headers = this.checked;
@@ -31,6 +31,11 @@
     chkWrap = document.getElementById('chk-wrap');
     chkWrap.addEventListener('change', function() {
       options.wrap = this.checked;
+      onChange();
+    });
+    chkBinary = document.getElementById('chk-binary');
+    chkBinary.addEventListener('change', function() {
+      options.stringBuilderType = this.checked ? 'Binary' : 'Unary';
       onChange();
     });
   };
@@ -45,7 +50,8 @@
 
   options = {
     headers: false,
-    wrap: false
+    wrap: false,
+    stringBuilderType: 'Unary'
   };
 
   _ref = setupEditors(onInput), sourceEditor = _ref.sourceEditor, outputEditor = _ref.outputEditor;
