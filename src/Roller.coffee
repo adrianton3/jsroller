@@ -113,23 +113,24 @@ buildGlobalObject = (globals) ->
 	string = 'var ___ = window;\n' +
 		'var ____ = {\n'
 	globals.forEach (entry, key) ->
-		string += "    #{entry.newName}: ___.#{key},\n"
+		string += "    #{entry.newName}: '#{key}',\n"
 		return
 	string += '};'
 
 
-buildProperty = (objectName, propertyName) ->
-	type: 'MemberExpression',
-	computed: false,
-	object:
-		type: 'Identifier',
-		name: objectName
-	property:
-		type: 'Identifier',
-		name: propertyName
+buildIdentifier = (name) ->
+	type: 'Identifier'
+	name: name
 
 
-getReplacer = (objectName, buildString) ->
+buildMemberExpression = (object, property, computed = false) ->
+	type: 'MemberExpression'
+	computed: computed
+	object: object
+	property: property
+
+
+getReplacer = (propertyBuilder, buildString) ->
 	map = new Map
 
 	replacer = (name) ->
@@ -137,7 +138,7 @@ getReplacer = (objectName, buildString) ->
 			(map.get name).newProperty
 		else
 			newName = buildString (map.size + 1)
-			newProperty = buildProperty objectName, newName
+			newProperty = propertyBuilder newName
 			map.set name, { newName, newProperty }
 			newProperty
 
@@ -164,10 +165,32 @@ obfuscate = (source, options = {}) ->
 			return
 		map
 
+
 	buildString = roller["get#{options.stringBuilderType}Builder"]()
-	[properties, replaceProperty] = getReplacer '_', buildString
-	[literals, replaceLiteral] = getReplacer '__', buildString
-	[globals, replaceGlobal] = getReplacer '____', buildString
+
+	[properties, replaceProperty] = getReplacer(
+		((name) -> buildMemberExpression (buildIdentifier '_'), (buildIdentifier name))
+		buildString
+	)
+
+	[literals, replaceLiteral] = getReplacer(
+		((name) -> buildMemberExpression (buildIdentifier '__'), (buildIdentifier name))
+		buildString
+	)
+
+	[globals, replaceGlobal] = getReplacer(
+		((name) ->
+			buildMemberExpression(
+				(buildIdentifier '___')
+				buildMemberExpression(
+					(buildIdentifier '____')
+					(buildIdentifier name)
+				)
+				true
+			)
+		)
+		buildString
+	)
 
 
 	replace = (node, frames) ->

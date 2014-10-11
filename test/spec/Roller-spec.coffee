@@ -98,7 +98,7 @@ describe 'Roller', ->
 				.toEqual 'var ______; function _______() { var ______; }'
 
 			it 'obfuscates global variables', ->
-				(expect obfuscate 'a;').toEqual '____._;'
+				(expect obfuscate 'a;').toEqual '___[____._];'
 
 			it 'obfuscates \'window\'', ->
 				(expect obfuscate 'window;').toEqual '___;'
@@ -124,7 +124,7 @@ describe 'Roller', ->
 
 		describe 'member expressions', ->
 			it 'obfuscates a member expression', ->
-				(expect obfuscate 'a.b;').toEqual '____._[_._];'
+				(expect obfuscate 'a.b;').toEqual '___[____._][_._];'
 
 			it 'obfuscates the same property twice', ->
-				(expect obfuscate 'a.b.b;').toEqual '____._[_._][_._];'
+				(expect obfuscate 'a.b.b;').toEqual '___[____._][_._][_._];'
