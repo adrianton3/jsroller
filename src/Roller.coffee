@@ -110,8 +110,7 @@ buildLiteralObject = (literals) ->
 
 
 buildGlobalObject = (globals) ->
-	string = 'var ___ = window;\n' +
-		'var ____ = {\n'
+	string = 'var ____ = {\n'
 	globals.forEach (entry, key) ->
 		string += "    #{entry.newName}: '#{key}',\n"
 		return
@@ -260,6 +259,7 @@ obfuscate = (source, options = {}) ->
 		header = ''
 		header += "#{propertyObject}\n" if properties.size
 		header += "#{literalsObject}\n" if literals.size
+		header += 'var ___ = window;\n'
 		header += "#{globalsObject}\n" if globals.size
 
 		newSource = header + newSource
