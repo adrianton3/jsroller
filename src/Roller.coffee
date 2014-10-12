@@ -248,7 +248,7 @@ obfuscate = (source, options = {}) ->
 
 
 	tree = esprima.parse source
-	replace tree, roller.Emp.add { varsMap: new Map, prefix: 5 }
+	replace tree, roller.Emp.add { varsMap: new Map, prefix: 4 }
 	newSource = escodegen.generate tree
 
 	if options.headers

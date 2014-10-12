@@ -77,25 +77,25 @@ describe 'Roller', ->
 
 		describe 'variables', ->
 			it 'obfuscates a local variable', ->
-				(expect obfuscate 'var a;').toEqual 'var ______;'
+				(expect obfuscate 'var a;').toEqual 'var _____;'
 
 			it 'obfuscates two local variables from the same declaration', ->
-				(expect obfuscate 'var a, b;').toEqual 'var ______, _______;'
+				(expect obfuscate 'var a, b;').toEqual 'var _____, ______;'
 
 			it 'obfuscates the same variable twice from the same declaration', ->
-				(expect obfuscate 'var a, a;').toEqual 'var ______, ______;'
+				(expect obfuscate 'var a, a;').toEqual 'var _____, _____;'
 
 			it 'does not obfuscate \'arguments\'', ->
 				expect obfuscate 'function f() { arguments; }'
-				.toEqual 'function ______() { arguments; }'
+				.toEqual 'function _____() { arguments; }'
 
 			it 'obfuscates \'arguments\' if it\'s declared locally', ->
 				expect obfuscate 'function f() { var arguments; }'
-				.toEqual 'function ______() { var _______; }'
+				.toEqual 'function _____() { var ______; }'
 
 			it 'preserves shadowing', ->
 				expect obfuscate 'var a; function f() { var a; }'
-				.toEqual 'var ______; function _______() { var ______; }'
+				.toEqual 'var _____; function ______() { var _____; }'
 
 			it 'obfuscates global variables', ->
 				(expect obfuscate 'a;').toEqual '___[____._];'
@@ -105,21 +105,21 @@ describe 'Roller', ->
 
 			it 'preserves distinct namespaces', ->
 				expect obfuscate 'function f(a) { } function g(b) { }'
-				.toEqual 'function ______(________) { } function _______(________) { }'
+				.toEqual 'function _____(_______) { } function ______(_______) { }'
 
 			it 'obfuscates variables in object definitions', ->
 				expect obfuscate 'var b; ({ a: b });'
-				.toEqual 'var ______; ({ a: ______ });'
+				.toEqual 'var _____; ({ a: _____ });'
 
 
 		describe 'functions', ->
 			it 'obfuscates a function\'s name inside a function declaration', ->
-				expect obfuscate 'function a() { }'
-				.toEqual 'function ______() { }'
+				expect obfuscate 'function a() { a; }'
+				.toEqual 'function _____() { _____; }'
 
 			it 'obfuscates a function\'s formal parameters', ->
 				expect obfuscate 'function f(a, b) { }'
-				.toEqual 'function ______(_______, ________) { }'
+				.toEqual 'function _____(______, _______) { }'
 
 
 		describe 'member expressions', ->
