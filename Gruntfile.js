@@ -11,13 +11,20 @@ module.exports = function(grunt) {
 				src: 'src/**/*.js',
 				dest: 'build/<%= pkg.name %>.min.js'
 			}
+		},
+		roll: {
+			jsroll: {
+				src: 'build/jsroller.min.js',
+				dest: 'build/jsroller.roll.js'
+			}
 		}
 	});
 
-	// Load the plugin that provides the "uglify" task.
+
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 
-	// Default task(s).
-	grunt.registerTask('default', ['uglify']);
+	grunt.loadTasks('tools/grunt-tasks');
 
+	grunt.registerTask('default', ['uglify', 'rollit']);
+	grunt.registerTask('rollit', ['roll:jsroll']);
 };
