@@ -1,0 +1,4 @@
+build/* linguist-vendored
+lib/* linguist-vendored
+examples/lib/* linguist-vendored
+test/lib/* linguist-vendored
